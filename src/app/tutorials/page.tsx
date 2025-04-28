@@ -5,76 +5,124 @@ import Navbar from "@/components/Navbar";
 import { gsap } from "gsap";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { fetchCourses, fetchProgrammingLanguages } from "@/lib/api/wordpress";
+import CourseCard from "@/components/tutorials/CourseCard";
+import LanguageFilter from "@/components/tutorials/LanguageFilter";
 
-// Tutorial data
-const tutorials = [
+// Mock data to use until the WordPress backend is setup
+const mockLanguages = [
+  { id: 1, name: "Java", slug: "java", count: 3 },
+  { id: 2, name: "Kotlin", slug: "kotlin", count: 2 },
+  { id: 3, name: "Python", slug: "python", count: 4 },
+  { id: 4, name: "JavaScript", slug: "javascript", count: 2 },
+];
+
+const mockCourses = [
   {
-    id: "android-mvvm",
-    title: "Building Android Apps with MVVM",
-    category: "Android",
-    description: "Learn how to structure your Android applications using the MVVM architecture pattern for cleaner, more maintainable code.",
-    date: "March 15, 2025",
-    readTime: "12 min read",
-    image: "/images/project-placeholder.jpg",
+    id: 1,
+    slug: "java-basics",
+    title: "أساسيات البرمجة بلغة Java",
+    excerpt: "تعلم أساسيات لغة Java من الصفر حتى الاحتراف، بدءاً من المفاهيم الأساسية وصولاً إلى البرمجة كائنية التوجه.",
+    featuredImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+    languages: [{ id: 1, name: "Java", slug: "java" }],
+    level: "مبتدئ",
+    duration: "8 أسابيع",
+    lessonCount: 24,
   },
   {
-    id: "android-room-db",
-    title: "Android Room Database Complete Guide",
-    category: "Android",
-    description: "Master the Room persistence library for Android to efficiently store and manage data in your applications.",
-    date: "February 28, 2025",
-    readTime: "15 min read",
-    image: "/images/project-placeholder.jpg",
+    id: 2,
+    slug: "kotlin-for-android",
+    title: "Kotlin لتطوير تطبيقات Android",
+    excerpt: "دورة شاملة في لغة Kotlin مع التركيز على تطوير تطبيقات Android الحديثة باستخدام أحدث التقنيات.",
+    featuredImage: "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?q=80&w=2070&auto=format&fit=crop",
+    languages: [{ id: 2, name: "Kotlin", slug: "kotlin" }],
+    level: "متوسط",
+    duration: "10 أسابيع",
+    lessonCount: 32,
   },
   {
-    id: "android-animations",
-    title: "Creating Engaging UI Animations in Android",
-    category: "Android",
-    description: "Discover how to implement smooth, performant animations in your Android apps to enhance the user experience.",
-    date: "January 10, 2025",
-    readTime: "10 min read",
-    image: "/images/project-placeholder.jpg",
+    id: 3,
+    slug: "python-data-science",
+    title: "علوم البيانات باستخدام Python",
+    excerpt: "تعلم كيفية تحليل البيانات واستخراج الرؤى منها باستخدام مكتبات Python الشهيرة مثل Pandas و NumPy و Matplotlib.",
+    featuredImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
+    languages: [{ id: 3, name: "Python", slug: "python" }],
+    level: "متقدم",
+    duration: "12 أسبوع",
+    lessonCount: 40,
   },
   {
-    id: "javafx-intro",
-    title: "Getting Started with JavaFX",
-    category: "JavaFX",
-    description: "A comprehensive guide to building your first desktop application with JavaFX and Scene Builder.",
-    date: "March 5, 2025",
-    readTime: "20 min read",
-    image: "/images/project-placeholder.jpg",
+    id: 4,
+    slug: "advanced-java",
+    title: "Java المتقدمة: تطبيقات الإنتربرايز",
+    excerpt: "تعلم تطوير تطبيقات الإنتربرايز باستخدام Java EE وتقنيات مثل Spring و Hibernate وأنماط التصميم المتقدمة.",
+    featuredImage: "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?q=80&w=2070&auto=format&fit=crop",
+    languages: [{ id: 1, name: "Java", slug: "java" }],
+    level: "متقدم",
+    duration: "14 أسبوع",
+    lessonCount: 36,
   },
   {
-    id: "javafx-fxml",
-    title: "Mastering FXML for JavaFX Applications",
-    category: "JavaFX",
-    description: "Learn how to use FXML to separate UI design from business logic in your JavaFX applications.",
-    date: "February 18, 2025",
-    readTime: "15 min read",
-    image: "/images/project-placeholder.jpg",
-  },
-  {
-    id: "javafx-custom-controls",
-    title: "Creating Custom Controls in JavaFX",
-    category: "JavaFX",
-    description: "Extend the JavaFX library by creating your own reusable custom controls for unique user interfaces.",
-    date: "January 25, 2025",
-    readTime: "18 min read",
-    image: "/images/project-placeholder.jpg",
+    id: 5,
+    slug: "js-web-development",
+    title: "تطوير الويب الحديث باستخدام JavaScript",
+    excerpt: "تعلم تطوير تطبيقات الويب الحديثة باستخدام JavaScript وإطارات العمل الشهيرة مثل React و Vue و Node.js.",
+    featuredImage: "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=2071&auto=format&fit=crop",
+    languages: [{ id: 4, name: "JavaScript", slug: "javascript" }],
+    level: "متوسط",
+    duration: "10 أسابيع",
+    lessonCount: 30,
   },
 ];
 
 export default function TutorialsPage() {
-  const [filter, setFilter] = useState<string>("all");
+  const [courses, setCourses] = useState(mockCourses);
+  const [languages, setLanguages] = useState(mockLanguages);
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
+  const [loading, setLoading] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-  const tutorialsRef = useRef<HTMLDivElement>(null);
 
-  const filteredTutorials = filter === "all"
-    ? tutorials
-    : tutorials.filter(tutorial => tutorial.category.toLowerCase() === filter.toLowerCase());
+  // Load data from WordPress API when it's ready
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        // جلب لغات البرمجة
+        const languagesData = await fetchProgrammingLanguages();
+        if (languagesData.length > 0) {
+          setLanguages(languagesData);
+        } else {
+          // استخدام البيانات التجريبية كنسخة احتياطية
+          setLanguages(mockLanguages);
+        }
+
+        // جلب الدورات
+        const coursesData = await fetchCourses();
+        if (coursesData.length > 0) {
+          setCourses(coursesData);
+        } else {
+          // استخدام البيانات التجريبية كنسخة احتياطية
+          setCourses(mockCourses);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // استخدام البيانات التجريبية في حالة الفشل
+        setLanguages(mockLanguages);
+        setCourses(mockCourses);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+  
+  // Filter courses client-side until API is set up
+  const filteredCourses = selectedLanguage === "all"
+    ? courses
+    : courses.filter(course => 
+        course.languages.some(lang => lang.slug === selectedLanguage)
+      );
 
   useEffect(() => {
     const tl = gsap.timeline({
@@ -86,161 +134,51 @@ export default function TutorialsPage() {
       { y: 20, opacity: 0 },
       { y: 0, opacity: 1 }
     );
-
-    tl.fromTo(
-      filterRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1 },
-      "-=0.4"
-    );
-
-    // Animate tutorials with stagger effect
-    gsap.fromTo(
-      ".tutorial-card",
-      { y: 40, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: tutorialsRef.current,
-          start: "top 80%",
-        }
-      }
-    );
   }, []);
 
-  // Re-animate tutorial cards when filter changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: filter triggers re-animation
-  useEffect(() => {
-    gsap.fromTo(
-      ".tutorial-card",
-      { scale: 0.95, opacity: 0 },
-      {
-        scale: 1,
-        opacity: 1,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: "power3.out"
-      }
-    );
-  }, [filter]);
-
   return (
-    <main className="min-h-screen bg-[#040414] text-white">
-      <div className="grid-pattern absolute inset-0 opacity-20" />
-      <div className="dots-animation absolute inset-0 z-0" />
+    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black z-0" />
 
       <Navbar />
 
-      <div className="container mx-auto px-6 pt-36 pb-20 relative z-10 page-transition">
+      <div className="container mx-auto px-6 pt-28 pb-20 relative z-10">
         <h1
           ref={titleRef}
-          className="text-4xl md:text-5xl font-bold mb-12 cyber-font gradient-text text-center"
+          className="text-4xl md:text-5xl font-bold mb-6 cyber-font text-center"
+          dir="rtl"
         >
-          Tutorials
+          <span className="text-[#00FF66]">تعلم</span> البرمجة
         </h1>
+        
+        <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto" dir="rtl">
+          استكشف مجموعة من الدورات التعليمية المتميزة في مختلف لغات البرمجة، من المستوى المبتدئ إلى المتقدم.
+        </p>
 
-        <div className="max-w-3xl mx-auto mb-12 text-center">
-          <p className="text-lg text-gray-300 exospace-font">
-            Learn development tips, tricks, and best practices with my tutorials.
-            Browse by category or explore all content below.
-          </p>
-        </div>
+        <LanguageFilter 
+          languages={languages} 
+          selectedLanguage={selectedLanguage} 
+          onSelectLanguage={setSelectedLanguage} 
+        />
 
-        <div ref={filterRef} className="flex justify-center mb-16 space-x-4">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-6 py-2 rounded-full transition-all duration-300 hover-text ${
-              filter === "all"
-                ? "bg-white/20 text-white"
-                : "bg-white/5 text-gray-400 hover:bg-white/10"
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter("android")}
-            className={`px-6 py-2 rounded-full transition-all duration-300 hover-text ${
-              filter === "android"
-                ? "bg-white/20 text-white"
-                : "bg-white/5 text-gray-400 hover:bg-white/10"
-            }`}
-          >
-            Android
-          </button>
-          <button
-            onClick={() => setFilter("javafx")}
-            className={`px-6 py-2 rounded-full transition-all duration-300 hover-text ${
-              filter === "javafx"
-                ? "bg-white/20 text-white"
-                : "bg-white/5 text-gray-400 hover:bg-white/10"
-            }`}
-          >
-            JavaFX
-          </button>
-        </div>
-
-        <div
-          ref={tutorialsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {filteredTutorials.map((tutorial) => (
-            <Link key={tutorial.id} href={`/tutorials/${tutorial.id}`}>
-              <Card
-                className="tutorial-card h-full bg-white/5 border-white/10 backdrop-blur-sm text-white hover:bg-white/10 transition-all duration-300"
-              >
-                <div className="aspect-video relative">
-                  <Image
-                    src={tutorial.image}
-                    alt={tutorial.title}
-                    fill
-                    className="object-cover rounded-t-lg"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <Badge
-                    className="absolute top-2 right-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm"
-                  >
-                    {tutorial.category}
-                  </Badge>
-                </div>
-
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xl exospace-font line-clamp-2">
-                    {tutorial.title}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-2">
-                  <CardDescription className="text-gray-300 line-clamp-3">
-                    {tutorial.description}
-                  </CardDescription>
-                </CardContent>
-
-                <CardFooter className="flex justify-between text-sm text-gray-400">
-                  <span>{tutorial.date}</span>
-                  <span>{tutorial.readTime}</span>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-16 text-center">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00FF66]"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+            {filteredCourses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        )}
+        
+        <div className="mt-16 text-center" dir="rtl">
           <Link
             href="/contact"
-            className="hover-text btn border-2 border-white/10 bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-md transition-all duration-300 backdrop-blur-sm inline-block"
+            className="px-8 py-3 rounded-full bg-[#00FF66]/20 text-[#00FF66] hover:bg-[#00FF66]/30 transition-all duration-300 inline-block"
           >
-            Request a Tutorial Topic
-            <Image
-              src="/images/arrowPoint.svg"
-              alt="Arrow"
-              width={16}
-              height={16}
-              className="inline ml-2"
-            />
+            هل تريد دورة في موضوع معين؟ تواصل معنا
           </Link>
         </div>
       </div>

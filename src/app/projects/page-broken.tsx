@@ -16,8 +16,7 @@ const projects = [
     category: "Travel",
     description: "A Platform That Helps You Discover The Most Intriguing Locations For Your Vacations. Book Luxe Epic Spots In A Deeper Tale.",
     technologies: ["React", "Node.js", "MongoDB", "Express"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop",
+    image: "https://source.unsplash.com/random/800x600/?travel", // Temporary image from Unsplash
     color: "#00FF66", // Green color from the screenshot
     links: {
       demo: "#",
@@ -30,8 +29,7 @@ const projects = [
     category: "Health",
     description: "An NGO That Focuses On Solving The Problem Of Climate Change In Africa. They're Inter-Disciplinary With Various Academic Institutions Involved.",
     technologies: ["React", "GraphQL", "Tailwind CSS", "Strapi"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&h=600&fit=crop",
+    image: "https://source.unsplash.com/random/800x600/?health", // Temporary image from Unsplash
     color: "#00FF66", // Green color from the screenshot
     links: {
       demo: "#",
@@ -44,8 +42,7 @@ const projects = [
     category: "Environment",
     description: "A platform connecting environmental enthusiasts with green initiatives and sustainable projects around the globe.",
     technologies: ["Vue.js", "Firebase", "Mapbox", "PWA"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1497005367839-6e852de72767?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg",
     color: "#00FF66",
     links: {
       demo: "#",
@@ -58,8 +55,7 @@ const projects = [
     category: "Healthcare",
     description: "A comprehensive health monitoring system that integrates with wearable devices to provide insights and recommendations.",
     technologies: ["React Native", "Redux", "AWS", "Machine Learning"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg",
     color: "#00FF66",
     links: {
       demo: "#",
@@ -68,19 +64,13 @@ const projects = [
   },
 ];
 
-// Project Card component with fallback mechanism for texture loading
+// 3D Project Card component
 function ProjectCard({ project, position, rotation }: { 
   project: typeof projects[0], 
   position: [number, number, number], 
   rotation: [number, number, number] 
 }) {
-  // Add a fallback mechanism in case texture loading fails
-  const texture = useTexture(project.image, (texture) => {
-    console.log(`Texture loaded successfully for ${project.title}`)
-  }, (error) => {
-    console.error(`Error loading texture for ${project.title}:`, error)
-  });
-  
+  const texture = useTexture(project.image);
   const cardRef = useRef<any>(null);
   
   useEffect(() => {

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import { gsap } from "gsap";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, useTexture, Environment, OrbitControls, Html } from "@react-three/drei";
 import { Vector3, Euler } from "three";
@@ -16,8 +17,7 @@ const projects = [
     category: "Travel",
     description: "A Platform That Helps You Discover The Most Intriguing Locations For Your Vacations. Book Luxe Epic Spots In A Deeper Tale.",
     technologies: ["React", "Node.js", "MongoDB", "Express"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg", // Replace with actual images
     color: "#00FF66", // Green color from the screenshot
     links: {
       demo: "#",
@@ -30,8 +30,7 @@ const projects = [
     category: "Health",
     description: "An NGO That Focuses On Solving The Problem Of Climate Change In Africa. They're Inter-Disciplinary With Various Academic Institutions Involved.",
     technologies: ["React", "GraphQL", "Tailwind CSS", "Strapi"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg",
     color: "#00FF66", // Green color from the screenshot
     links: {
       demo: "#",
@@ -44,8 +43,7 @@ const projects = [
     category: "Environment",
     description: "A platform connecting environmental enthusiasts with green initiatives and sustainable projects around the globe.",
     technologies: ["Vue.js", "Firebase", "Mapbox", "PWA"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1497005367839-6e852de72767?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg",
     color: "#00FF66",
     links: {
       demo: "#",
@@ -58,9 +56,86 @@ const projects = [
     category: "Healthcare",
     description: "A comprehensive health monitoring system that integrates with wearable devices to provide insights and recommendations.",
     technologies: ["React Native", "Redux", "AWS", "Machine Learning"],
-    // Using direct placeholder images from Unsplash instead of local files
-    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=600&fit=crop",
+    image: "/images/project-placeholder.jpg",
     color: "#00FF66",
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "android-fitness-tracker",
+    title: "Fitness Tracker App",
+    category: "Android",
+    description: "A comprehensive fitness tracking application with workout plans, progress monitoring, and social features.",
+    technologies: ["Kotlin", "MVVM", "Room", "Retrofit", "Material Design"],
+    image: "/images/project-placeholder.jpg", // You can replace this with actual project images
+    color: "#00FF66", // Green color from the screenshot
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "android-recipe-app",
+    title: "Recipe Finder",
+    category: "Android",
+    description: "An app that helps users discover recipes based on available ingredients, dietary restrictions, and preferences.",
+    technologies: ["Java", "Firebase", "Material Components", "Glide"],
+    image: "/images/project-placeholder.jpg",
+    color: "#00FF66", // Green color from the screenshot
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "android-news-reader",
+    title: "NewsFlash Reader",
+    category: "Android",
+    description: "A personalized news reader app that curates content based on user interests and reading habits.",
+    technologies: ["Kotlin", "Jetpack Compose", "Coroutines", "Room", "Retrofit"],
+    image: "/images/project-placeholder.jpg",
+    color: "#00FF66", // Green color from the screenshot
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "javafx-inventory-system",
+    title: "Inventory Management System",
+    category: "JavaFX",
+    description: "A desktop application for inventory management, order processing, and sales tracking for small businesses.",
+    technologies: ["JavaFX", "FXML", "MySQL", "JasperReports"],
+    image: "/images/project-placeholder.jpg",
+    color: "#00FF66", // Green color from the screenshot
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "javafx-pos-system",
+    title: "Point of Sale System",
+    category: "JavaFX",
+    description: "A comprehensive POS system with inventory management, sales tracking, and reporting features.",
+    technologies: ["JavaFX", "Scene Builder", "SQL", "Jasper Reports"],
+    image: "/images/project-placeholder.jpg",
+    color: "#00FF66", // Green color from the screenshot
+    links: {
+      demo: "#",
+      github: "#",
+    },
+  },
+  {
+    id: "javafx-student-management",
+    title: "Student Management System",
+    category: "JavaFX",
+    description: "A desktop application for educational institutions to manage student records, attendance, and performance.",
+    technologies: ["JavaFX", "FXML", "MySQL", "iText PDF"],
+    image: "/images/project-placeholder.jpg",
+    color: "#00FF66", // Green color from the screenshot
     links: {
       demo: "#",
       github: "#",
@@ -68,20 +143,14 @@ const projects = [
   },
 ];
 
-// Project Card component with fallback mechanism for texture loading
+// 3D Project Card component
 function ProjectCard({ project, position, rotation }: { 
   project: typeof projects[0], 
   position: [number, number, number], 
   rotation: [number, number, number] 
 }) {
-  // Add a fallback mechanism in case texture loading fails
-  const texture = useTexture(project.image, (texture) => {
-    console.log(`Texture loaded successfully for ${project.title}`)
-  }, (error) => {
-    console.error(`Error loading texture for ${project.title}:`, error)
-  });
-  
-  const cardRef = useRef<any>(null);
+  const texture = useTexture(project.image);
+  const cardRef = useRef<THREE.Mesh>(null);
   
   useEffect(() => {
     if (cardRef.current) {
@@ -139,6 +208,8 @@ function ProjectCard({ project, position, rotation }: {
   );
 }
 
+
+
 // 3D Scene component
 function ProjectsScene() {
   return (
@@ -172,12 +243,18 @@ function ProjectsScene() {
         <ProjectCard project={projects[1]} position={[4, 0, 0]} rotation={[0, -0.2, 0]} />
         <ProjectCard project={projects[2]} position={[-2, -4, -2]} rotation={[0.2, 0.1, 0]} />
         <ProjectCard project={projects[3]} position={[2, -4, -2]} rotation={[0.2, -0.1, 0]} />
+        <ProjectCard project={projects[4]} position={[-4, -8, 0]} rotation={[0, 0.2, 0]} />
+        <ProjectCard project={projects[5]} position={[4, -8, 0]} rotation={[0, -0.2, 0]} />
+        <ProjectCard project={projects[6]} position={[-2, -12, -2]} rotation={[0.2, 0.1, 0]} />
+        <ProjectCard project={projects[7]} position={[2, -12, -2]} rotation={[0.2, -0.1, 0]} />
+        <ProjectCard project={projects[8]} position={[-4, -16, 0]} rotation={[0, 0.2, 0]} />
+        <ProjectCard project={projects[9]} position={[4, -16, 0]} rotation={[0, -0.2, 0]} />
       </Suspense>
     </Canvas>
   );
 }
 
-export default function Projects3DPage() {
+export default function ProjectsPage() {
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
